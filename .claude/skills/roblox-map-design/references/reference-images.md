@@ -18,7 +18,7 @@ If several images disagree, ask the user which one wins for style vs. layout.
 
 ## 2. Palette extraction
 ```bash
-python3 .claude/skills/roblox-map-design/scripts/palette_from_image.py reference-images/*.png --colors 7
+python3 $SKILL_DIR/scripts/palette_from_image.py reference-images/*.png --colors 7
 ```
 Outputs hex, `Color3.fromRGB(...)` and a suggested role per colour (dominant,
 secondary, accent, shadow, highlight), plus a Luau `PALETTE` table you can paste

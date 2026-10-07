@@ -76,7 +76,7 @@ Open Cloud instead — no clicking:
      as environment variables where Claude Code runs.
 2. Upload (uploads only new/changed files — tracked by sha1 in the ledger):
    ```bash
-   python3 .claude/skills/roblox-map-design/scripts/upload_to_roblox.py \
+   python3 $SKILL_DIR/scripts/upload_to_roblox.py \
        --manifest <EXPORT_DIR>/manifest.json \
        --textures <TEX_OUT> --material Cliff_Stone=Slate:10 --material Dock_Wood=WoodPlanks:6 \
        --ledger map-memory/assets.json

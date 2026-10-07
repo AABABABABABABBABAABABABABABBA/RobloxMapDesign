@@ -1,6 +1,6 @@
 ---
 name: roblox-map-design
-description: Design and build professional, distinctive Roblox maps that never look AI-generated — no copy-pasted props, no overlapping/z-fighting parts, no grid-stamped layouts, no default materials. Drives Roblox Studio (Studio MCP) and Blender (Blender MCP) to model custom meshes and bake custom seamless PBR textures, auto-uploads and inserts them into Studio, uses user reference images for palette/style/image-to-3D, checks work with background render views instead of desktop screenshots, and keeps a persistent memory of everything it built across sessions. Use whenever the user asks to make, continue, improve, redesign, texture, light, polish or audit a Roblox map, level, lobby, obby, environment or scene, or shares reference images for one.
+description: Design and build professional, distinctive Roblox maps that never look AI-generated — no copy-pasted props, no overlapping/z-fighting parts, no grid-stamped layouts, no default materials. Drives Roblox Studio (Studio MCP) and Blender (Blender MCP) to model custom meshes and bake custom seamless PBR textures, auto-uploads and inserts them into Studio, uses user reference images for palette/style/image-to-3D, checks work with background render views instead of desktop screenshots, and keeps a persistent memory of everything it built across sessions. Also repairs broken maps: z-fighting/flicker, sparkling seams, camera snapping/clipping, LOD and streaming pop-in, overlaps, floating or unanchored parts. Use whenever the user asks to make, continue, improve, redesign, fix, repair, debug glitches in, texture, light, polish or audit a Roblox map, level, lobby, obby, environment or scene, or shares reference images for one.
 ---
 
 # Roblox Map Design
@@ -9,6 +9,10 @@ You are a senior Roblox environment artist + level designer + art director. The
 bar is "front page of Discover with a look nobody else has", not "generated in five
 minutes". Every placement is intentional, every surface is chosen, and the map must
 pass the automated audits before you call anything done.
+
+**Skill directory:** `${CLAUDE_SKILL_DIR}` — every `scripts/…` and `references/…`
+path in this skill is relative to it. Where a reference file writes `$SKILL_DIR`,
+substitute this path. Read scripts from there before pasting them into an MCP tool.
 
 ## Tools
 
@@ -25,6 +29,15 @@ user to run). Never claim a build, upload or render happened when it didn't.
 
 **Never use computer-use / desktop screenshots to look at the work.** Use the
 background render views (`references/render-views.md`).
+
+## Repair mode
+If the user reports something broken or glitchy ("blocks glitch when I move the
+camera", flicker, camera jerks, things pop in, props float/clip, map falls apart on
+Play) or hands you an existing map: do step 0 (Recall), then follow
+`references/repair.md` — diagnose with `audit_map.luau` + `fix_map.luau`
+(`APPLY=false`), protect intent with tags, apply (`APPLY=true`, one undo step),
+repeat until clean, verify with render views, log it. Then continue with the normal
+workflow only if the user wants more than the fix.
 
 ## Workflow
 
@@ -85,11 +98,14 @@ fall back to asking the user to Import 3D (pipeline doc explains).
 Lighting recipes in `references/roblox-studio.md`. Warm key / cool fill, Atmosphere
 matched to the palette, motivated local lights only, one accent per view.
 
-### 9. Look, audit, critique — mandatory gate
-1. `audit_map.luau` on `workspace.Map`: fix **every** OVERLAP, EXACT_DUPLICATE,
-   Z_FIGHT, CLONE_STAMP, FLOATING; justify each GRID_PATTERN that's architecture
-   (tag `AllowRepeat`). Hidden intentional embeds get `AllowOverlap`; hanging things
-   `AllowFloat`. Re-run until `RESULT: CLEAN`.
+### 9. Look, audit, fix, critique — mandatory gate
+1. `audit_map.luau` on `workspace.Map`, then `fix_map.luau` dry run → apply → repeat
+   (`references/repair.md`) until the audit says `RESULT: CLEAN` and fix_map has no
+   `[fix]` items. That covers overlaps, duplicates, z-fighting, seams, clone stamps,
+   floating/unanchored parts and camera glitches (snap, thin walls, LOD/stream pop).
+   Justify each GRID_PATTERN that's architecture (tag `AllowRepeat`); hidden
+   intentional embeds get `AllowOverlap`; hanging things `AllowFloat`. Put
+   `Map._Waypoints` along the critical path so the camera sweep covers it.
 2. Render views: plan view + every hero camera (`memory.luau camera_go` + viewport
    capture). Run the self-critique loop in `references/art-direction.md` §8 and fix
    the worst issue. Compare against reference images.
@@ -113,6 +129,8 @@ matched to the palette, motivated local lights only, one accent per view.
 5. No default look in the final pass: no gray Plastic baseplate, default sky or
    default lighting; key surfaces use the map's own MaterialVariants.
 6. No floating objects; nothing clipping through walkable paths.
+6b. No camera glitches: no flicker or sparkling seams, decor never snaps the camera,
+    walls thick enough not to see through, landmarks never pop out.
 7. One strong accent per view — no neon, bloom or particle spam.
 8. Every map has a hook, a signature motif and a hero landmark visible from spawn.
 9. Never claim the map is clean without the audit output, or that it looks good
@@ -122,12 +140,13 @@ matched to the palette, motivated local lights only, one accent per view.
 ## Files
 References: `design-principles.md`, `art-direction.md`, `anti-slop-checklist.md`,
 `roblox-studio.md`, `blender-pipeline.md`, `texturing.md`, `reference-images.md`,
-`render-views.md`, `memory.md`.
+`render-views.md`, `memory.md`, `repair.md`.
 
 Scripts:
 | Script | Runs in | Does |
 |---|---|---|
 | `audit_map.luau` | Studio | overlap / duplicate / z-fight / clone-stamp / grid / floating audit |
+| `fix_map.luau` | Studio | auto-repair: z-fight, seams, camera snap/clip, LOD/stream pop, overlaps, floating, unanchored, clone stamps (dry run → apply, one undo) |
 | `scatter.luau` | Studio | Poisson-disk, clustered, overlap-aware natural scattering |
 | `layout_snapshot.luau` | Studio | raycast top-down colour+height grid (background plan view) |
 | `memory.luau` | Studio | in-place memory: brief, build log, tags, inventory, camera bookmarks |

@@ -20,8 +20,34 @@ AI-generated, and keeps working on them across sessions.
   renders and a raycast plan view of the Studio map), not desktop screenshots.
 - **Memory**: `map-memory/` in the repo, plus a log, instance tags and camera
   bookmarks saved inside the place file.
+- **Repair**: `fix_map.luau` finds and fixes broken maps and camera glitches.
+  It handles flickering surfaces (z-fighting), sparkling seams, the camera snapping
+  in on bushes or leaves, walls you can see through, LOD and streaming pop-in,
+  clipping or floating props, and parts that fall when you press Play. It runs as
+  a dry run first, then applies everything as one undo step.
 - **Reference images**: drop them in `reference-images/` or attach them in chat.
   They drive the palette, style, layout and image-to-3D assets.
+
+## Install in Claude Code
+In Claude Code, run:
+```
+/plugin marketplace add AABABABABABABBABAABABABABABBA/RobloxMapDesign
+/plugin install roblox-map-design@roblox-map-design
+```
+or from a terminal:
+```bash
+claude plugin marketplace add AABABABABABABBABAABABABABABBA/RobloxMapDesign
+claude plugin install roblox-map-design@roblox-map-design
+```
+Until this branch is merged into the default branch, pin it:
+`AABABABABABABBABAABABABABABBA/RobloxMapDesign#claude/gracious-noether-jgu4no`.
+If the repo is private, your git/GitHub login on that machine must have access.
+Update later with `claude plugin marketplace update roblox-map-design`.
+
+The plugin also registers the Blender MCP server (`uvx blender-mcp`) from `.mcp.json`.
+
+Without plugins: copy `.claude/skills/roblox-map-design/` into `~/.claude/skills/`
+(all projects) or into your project's `.claude/skills/`.
 
 ## Setup
 1. **Roblox Studio MCP**: install the official server
@@ -47,6 +73,7 @@ Ask Claude Code something like:
 - "Make a cozy fishing village lobby map, here are 3 reference images"
 - "Continue the map" (it picks up from memory)
 - "Audit my map for overlaps and copy-paste"
+- "My map glitches when I move the camera, fix it"
 - "Retexture the cliffs with custom stone that matches the palette"
 
 You can also invoke the skill directly with `/roblox-map-design`.

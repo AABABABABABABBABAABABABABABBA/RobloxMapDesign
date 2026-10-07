@@ -22,6 +22,7 @@
 local CONFIG = {
 	ROOT = workspace:FindFirstChild("Map") or workspace,
 	OVERLAP_TOL = 0.05, -- studs of penetration allowed
+	GROUND_SINK_MAX = 0.6, -- props sunk this far into the surface below count as grounded
 	PROP_MAX_SIZE = 30, -- models smaller than this are "props": internal overlaps ignored
 	CLONE_RADIUS = 40,
 	CLONE_ANGLE_DEG = 5,
@@ -98,35 +99,37 @@ local function radiusOn(axis: Vector3, ax: { Vector3 }, half: Vector3): number
 	return math.abs(axis:Dot(ax[1])) * half.X + math.abs(axis:Dot(ax[2])) * half.Y + math.abs(axis:Dot(ax[3])) * half.Z
 end
 
--- separating-axis test; returns min overlap over all axes (penetration depth, <=0 when separated)
-local function obbDepth(cfA: CFrame, sA: Vector3, cfB: CFrame, sB: Vector3): number
+-- SAT: returns penetration depth (<= 0 when separated) and the axis of least
+-- overlap, oriented from A towards B
+local function obbDepth(cfA: CFrame, sA: Vector3, cfB: CFrame, sB: Vector3): (number, Vector3)
 	local aA, aB = axes(cfA), axes(cfB)
 	local hA, hB = sA / 2, sB / 2
 	local d = cfB.Position - cfA.Position
-	local best = math.huge
-	local function test(L: Vector3)
+	local best, bestAxis = math.huge, Vector3.yAxis
+	local function test(L: Vector3, isFace: boolean)
 		local m = L.Magnitude
 		if m < 1e-6 then
 			return
 		end
 		L /= m
 		local o = radiusOn(L, aA, hA) + radiusOn(L, aB, hB) - math.abs(d:Dot(L))
-		if o < best then
+		-- prefer face axes on ties so pushes/seam closes are along face normals
+		if o < best - (isFace and 0 or 1e-4) then
 			best = o
+			bestAxis = if d:Dot(L) >= 0 then L else -L
 		end
 	end
 	for i = 1, 3 do
-		test(aA[i])
-		test(aB[i])
+		test(aA[i], true)
+		test(aB[i], true)
 	end
 	for i = 1, 3 do
 		for j = 1, 3 do
-			test(aA[i]:Cross(aB[j]))
+			test(aA[i]:Cross(aB[j]), false)
 		end
 	end
-	return best
+	return best, bestAxis
 end
-
 local function worldAABB(cf: CFrame, size: Vector3): (Vector3, Vector3)
 	local h = size / 2
 	local ax = axes(cf)
@@ -261,7 +264,7 @@ do
 			return
 		end
 		local a, b = parts[i], parts[j]
-		local depth = obbDepth(a.CFrame, a.Size, b.CFrame, b.Size)
+		local depth, axis = obbDepth(a.CFrame, a.Size, b.CFrame, b.Size)
 		if depth < -0.02 then
 			return
 		end
@@ -281,6 +284,9 @@ do
 
 		if depth <= CONFIG.OVERLAP_TOL then
 			return
+		end
+		if math.abs(axis.Y) > 0.7 and depth <= CONFIG.GROUND_SINK_MAX then
+			return -- grounded: resting on / sunk into the surface below
 		end
 		local oa, ob = ownerOf(a), ownerOf(b)
 		if oa and oa == ob then

@@ -1,0 +1,16 @@
+{
+  "name": "roblox-map-design",
+  "owner": { "name": "AABABABABABABBABAABABABABABBA" },
+  "description": "Professional Roblox map design for Claude Code: Studio + Blender MCP, custom textures, auto-import, render views, memory, and glitch repair.",
+  "plugins": [
+    {
+      "name": "roblox-map-design",
+      "source": ".",
+      "description": "Build and repair Roblox maps that don't look AI-made: no overlaps or copy-paste, custom Blender meshes and PBR textures auto-imported into Studio, background render views, persistent memory, and camera-glitch fixing.",
+      "version": "1.1.0",
+      "category": "game-development",
+      "tags": ["roblox", "blender", "level-design", "mcp", "luau"],
+      "skills": ["./.claude/skills/"]
+    }
+  ]
+}

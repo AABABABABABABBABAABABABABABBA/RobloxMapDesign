@@ -30,7 +30,7 @@ execute_blender_code(<contents of scripts/blender_render_views.py>)
 1. `run_code(<layout_snapshot.luau>)` (set `CELLS` 64–96, optional `REGION`).
 2. Save the printed block (from `LAYOUT {` to `END_LAYOUT`) to
    `renders/snapshot.txt` (the Write tool is fine).
-3. `python3 .claude/skills/roblox-map-design/scripts/render_layout.py renders/snapshot.txt -o renders/plan.png`
+3. `python3 $SKILL_DIR/scripts/render_layout.py renders/snapshot.txt -o renders/plan.png`
 4. Read `renders/plan.png`.
 
 What to look for: path continuity and width, landmark placement vs. spawn,

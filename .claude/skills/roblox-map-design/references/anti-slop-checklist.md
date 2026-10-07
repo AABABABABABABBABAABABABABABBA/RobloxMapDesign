@@ -12,6 +12,14 @@ Run this after `audit_map.luau` comes back clean. Report each item to the user a
 - [ ] 0 `FLOATING` objects
 - [ ] `AllowOverlap` tag used < ~5% of parts, only where the overlap is hidden
 
+## Camera & glitches (from `fix_map.luau`)
+- [ ] 0 `[fix]` items left after the last dry run
+- [ ] Camera sweep run along `Map._Waypoints` — no decor snaps the camera
+- [ ] No flicker (Z_FIGHT/DECAL_FIGHT) or sparkling seams (SEAM)
+- [ ] Landmarks Persistent if StreamingEnabled; big meshes don't LOD-pop
+- [ ] Nothing unanchored that should be static; nothing below the kill plane
+- [ ] `[ask]` items each decided and noted in memory
+
 ## Visual tells of generated maps — look for each
 - [ ] **Uniform spacing**: trees/lamps/rocks at equal intervals → re-scatter.
 - [ ] **Same yaw**: props all facing the same direction → rotate meaningfully.
